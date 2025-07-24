@@ -1,0 +1,34 @@
+aside.menu-area{
+    background-color: #003366;
+}
+
+.menu a{
+    display: block;
+    text-decoration: none;
+    color: #FFF;
+    font-weight: 300;
+    padding: 15px;
+}
+
+.menu a:hover{
+    border-bottom: #FFF solid 1px;
+}
+
+@media(max-width: 768px){
+    .menu{
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .menu a{
+        display: inline;
+        padding: 10px;
+        margin: 0px;
+    }
+
+    .menu{
+        height: 100%;
+        justify-content: space-around;
+    }
+}
