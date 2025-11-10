@@ -25,6 +25,7 @@ export class DatabasePostgres {
         `;
     } 
 
+    
     async findByEmail(email) {
         const result = await sql`SELECT * FROM users WHERE email = ${email};`;
         return result[0];
