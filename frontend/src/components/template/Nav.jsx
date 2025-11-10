@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 const Nav = () => (
     <aside className="menu-area">
         <nav className="menu">
+            
             <Link to="/login">
                 <i className="fa fa-sign-in"></i> Login
             </Link>

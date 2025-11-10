@@ -1,57 +1,72 @@
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import './App.css';
-// src/App.jsx
-import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../auth/AuthContext';
 import PrivateRoute from '../auth/PrivateRoute';
 
+// Componentes principais
+import Logo from '../components/template/Logo';
+import Nav from '../components/template/Nav';
+  
+// Páginas
 import Login from '../components/user/LoginForm';
 import Register from '../components/user/RegisterForm';
 import UserCrud from '../components/user/UserCrud';
 import Home from '../components/home/Home';
-
-import MainLayout from '../components/template/MainLayout';
+import Footer from '../components/template/Footer';
 
 function App() {
-    return (
-        <AuthProvider>
-            <Router>
-                <Routes>
-                    {/* Rotas públicas */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+  return (
+    <AuthProvider>
+      <Router>
+        <div className="app"> {/* layout principal com grid e sem fundo branco */}
+          {/* Exibe a estrutura fixa apenas se o usuário estiver logado */}
+          <PrivateRoute>
+            <Logo />
+            <Nav />
+          </PrivateRoute>
 
-                    {/* Rotas privadas com layout padrão */}
-                    <Route
-                        path="/"
-                        element={
-                            <PrivateRoute>
-                                <MainLayout>
-                                    <Home />
-                                </MainLayout>
-                            </PrivateRoute>
-                        }
-                    />
+          <main className="app-content">
+            <Routes>
+              {/* Rotas públicas */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-                    <Route
-                        path="/users"
-                        element={
-                            <PrivateRoute>
-                                <MainLayout>
-                                    <UserCrud />
-                                </MainLayout>
-                            </PrivateRoute>
-                        }
-                    />
+              {/* Rotas privadas */}
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
 
-                    {/* Redirecionamento padrão */}
-                    <Route path="*" element={<Navigate to="/login" replace />} />
-                </Routes>
-            </Router>
-        </AuthProvider>
-    );
+              <Route
+                path="/users"
+                element={
+                  <PrivateRoute>
+                    <UserCrud />
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Redirecionamento padrão */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </main>
+
+          <PrivateRoute>
+            <Footer />
+          </PrivateRoute>
+
+        </div>
+      </Router>
+    </AuthProvider>
+  );
 }
 
 export default App;

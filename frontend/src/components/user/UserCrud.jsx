@@ -1,27 +1,28 @@
 import React, { Component } from "react";
 import axios from 'axios';
-import { Navigate } from 'react-router-dom'; // Importa o Navigate para redirecionar
+import { Navigate } from 'react-router-dom';
 import Main from '../template/Main';
+import './UserCrud.css'; // Importa o CSS com o layout fixo e scroll interno
 
 const headerProps = {
     icon: 'users',
     title: 'Usuários',
     subtitle: 'Cadastro de usuários: Incluir, Listar, Alterar e Excluir!'
-}
+};
 
 const baseUrl = 'http://localhost:3001/users';
 const initialState = {
     user: { name: '', email: '' },
     list: []
-}
+};
 
 export default class UserCrud extends Component {
-    state = { ...initialState }
+    state = { ...initialState };
 
     componentDidMount() {
-        axios(baseUrl).then(resp => {
-            this.setState({ list: resp.data });
-        });
+        axios(baseUrl)
+            .then(resp => this.setState({ list: resp.data }))
+            .catch(err => console.error("Erro ao carregar usuários:", err));
     }
 
     clear() {
@@ -33,10 +34,12 @@ export default class UserCrud extends Component {
         const method = user.id ? 'put' : 'post';
         const url = user.id ? `${baseUrl}/${user.id}` : baseUrl;
 
-        axios[method](url, user).then(resp => {
-            const list = this.getUpdatedList(resp.data);
-            this.setState({ user: initialState.user, list });
-        });
+        axios[method](url, user)
+            .then(resp => {
+                const list = this.getUpdatedList(resp.data);
+                this.setState({ user: initialState.user, list });
+            })
+            .catch(err => console.error("Erro ao salvar usuário:", err));
     }
 
     getUpdatedList(user, add = true) {
@@ -53,7 +56,7 @@ export default class UserCrud extends Component {
 
     renderForm() {
         return (
-            <div className="form">
+            <div className="form card shadow-sm p-3">
                 <div className="row">
                     <div className="col-12 col-md-12">
                         <div className="form-group">
@@ -68,11 +71,12 @@ export default class UserCrud extends Component {
                             />
                         </div>
                     </div>
+
                     <div className="col-12 col-md-12">
                         <div className="form-group">
                             <label>E-mail</label>
                             <input
-                                type="text"
+                                type="email"
                                 className="form-control"
                                 name="email"
                                 value={this.state.user.email}
@@ -82,7 +86,9 @@ export default class UserCrud extends Component {
                         </div>
                     </div>
                 </div>
+
                 <hr />
+
                 <div className="row">
                     <div className="col-12 d-flex justify-content-end">
                         <button className="btn btn-primary" onClick={e => this.save(e)}>
@@ -102,60 +108,63 @@ export default class UserCrud extends Component {
     }
 
     remove(user) {
-        axios.delete(`${baseUrl}/${user.id}`).then(resp => {
-            const list = this.getUpdatedList(user, false);
-            this.setState({ list });
-        });
+        axios.delete(`${baseUrl}/${user.id}`)
+            .then(() => {
+                const list = this.getUpdatedList(user, false);
+                this.setState({ list });
+            })
+            .catch(err => console.error("Erro ao excluir usuário:", err));
     }
 
     renderTable() {
         return (
-            <table className="table mt-4">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.renderRows()}
-                </tbody>
-            </table>
+            <div className="table-container mt-4">
+                <table className="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th className="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.renderRows()}
+                    </tbody>
+                </table>
+            </div>
         );
     }
 
     renderRows() {
-        return this.state.list.map(user => {
-            return (
-                <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>
-                        <button className="btn btn-warning" onClick={() => this.load(user)}>
-                            <i className="fa fa-pencil"></i>
-                        </button>
-                        <button className="btn btn-danger ms-2" onClick={() => this.remove(user)}>
-                            <i className="fa fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            );
-        });
+        return this.state.list.map(user => (
+            <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td className="text-center">
+                    <button className="btn btn-warning btn-sm" onClick={() => this.load(user)}>
+                        <i className="fa fa-pencil"></i>
+                    </button>
+                    <button className="btn btn-danger btn-sm ms-2" onClick={() => this.remove(user)}>
+                        <i className="fa fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        ));
     }
 
     render() {
-        // ✅ Verificação do token
         if (!localStorage.getItem('token')) {
             return <Navigate to="/login" replace />;
         }
 
         return (
             <Main {...headerProps}>
-                {this.renderForm()}
-                {this.renderTable()}
+                <div className="main-content">
+                    {this.renderForm()}
+                    {this.renderTable()}
+                </div>
             </Main>
         );
     }
